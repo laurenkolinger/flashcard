@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benthic Species Flashcards & Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .file-input-container {
+            padding: 30px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .file-input-label:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        }
+        
+        #imageInput {
+            display: none;
+        }
+        
+        .mode-selector {
+            padding: 20px 30px;
+            background: #e9ecef;
+            display: none;
+            text-align: center;
+        }
+        
+        .mode-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .mode-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .deck-selector {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: none;
+        }
+        
+        .deck-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .deck-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .deck-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .deck-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .deck-count {
+            display: inline-block;
+            margin-left: 5px;
+            padding: 2px 8px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        
+        .quiz-setup {
+            padding: 20px 30px;
+            background: #fff;
+            display: none;
+        }
+        
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-option {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+        }
+        
+        .quiz-option label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .quiz-option select,
+        .quiz-option input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .start-quiz-btn {
+            width: 100%;
+            padding: 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .start-quiz-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .flashcard-container {
+            padding: 30px;
+            display: none;
+            min-height: 500px;
+        }
+        
+        .flashcard {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 20px;
+        }
+        
+        .card-front {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+        
+        .card-image {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-text {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .species-name {
+            font-size: 2em;
+            font-style: italic;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .source-credit {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .progress {
+            font-size: 1em;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .keyboard-hints {
+            text-align: center;
+            margin-top: 15px;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .quiz-container {
+            padding: 30px;
+            display: none;
+            min-height: 500px;
+        }
+        
+        .quiz-progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .quiz-progress-fill {
+            height: 100%;
+            background: #28a745;
+            transition: width 0.3s;
+        }
+        
+        .quiz-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .quiz-question {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .multiple-choice-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .mc-option {
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .mc-option:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+        
+        .mc-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .mc-option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .mc-option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .fill-blank-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-style: italic;
+            text-align: center;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #764ba2;
+        }
+        
+        .feedback {
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .results-container {
+            padding: 30px;
+            display: none;
+            text-align: center;
+        }
+        
+        .score-display {
+            font-size: 3em;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .wrong-answers-list {
+            margin: 20px 0;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .wrong-answer-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .wrong-answer-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .wrong-answer-text {
+            flex: 1;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .action-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🪸 Benthic Species Learning System 🧽</h1>
+            <p>Master coral and sponge species identification</p>
+        </div>
+        
+        <div class="file-input-container">
+            <label for="imageInput" class="file-input-label">
+                📁 Select Images from Folder
+            </label>
+            <input type="file" id="imageInput" multiple accept="image/*">
+            <p style="margin-top: 15px; color: #6c757d; font-size: 0.9em;">
+                Select all images from: /scraped_imgs/
+            </p>
+        </div>
+        
+        <div class="mode-selector" id="modeSelector">
+            <div class="mode-buttons">
+                <button class="mode-btn active" onclick="selectMode('study')">
+                    📚 Study Mode
+                </button>
+                <button class="mode-btn" onclick="selectMode('quiz')">
+                    🎯 Quiz Mode
+                </button>
+            </div>
+        </div>
+        
+        <div class="deck-selector" id="deckSelector">
+            <h3 style="margin-bottom: 15px; color: #495057;">Choose Decks:</h3>
+            <div class="deck-buttons" id="deckButtons"></div>
+            <button class="nav-btn" style="margin-top: 15px" onclick="shuffleCurrentDeck()">🔀 Shuffle Deck</button>
+        </div>
+        
+        <div class="quiz-setup" id="quizSetup">
+            <h3 style="margin-bottom: 20px; color: #495057;">Quiz Settings:</h3>
+            <div class="quiz-options">
+                <div class="quiz-option">
+                    <label>Number of Questions:</label>
+                    <select id="quizSize">
+                        <option value="10">10 Questions</option>
+                        <option value="20">20 Questions</option>
+                        <option value="50">50 Questions</option>
+                        <option value="100">100 Questions</option>
+                    </select>
+                </div>
+                <div class="quiz-option">
+                    <label>Question Type:</label>
+                    <div>
+                        <label><input type="radio" name="quizType" value="multiple" checked> Multiple Choice</label>
+                        <label><input type="radio" name="quizType" value="fillblank"> Fill in the Blank</label>
+                    </div>
+                </div>
+            </div>
+            <button class="start-quiz-btn" onclick="startQuiz()">Start Quiz!</button>
+        </div>
+        
+        <div class="flashcard-container" id="flashcardContainer">
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-face card-front">
+                    <img class="card-image" id="cardImageFront" src="" alt="">
+                    <p style="margin-top: 10px; color: #667eea; font-size: 0.9em;">Click or press SPACE to reveal</p>
+                </div>
+                <div class="card-face card-back">
+                    <div class="card-text">
+                        <div class="species-name" id="speciesName"></div>
+                        <div class="source-credit" id="sourceCredit"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="nav-btn" onclick="previousCard()">← Previous</button>
+                <div class="progress" id="progress">1 / 1</div>
+                <button class="nav-btn" onclick="nextCard()">Next →</button>
+            </div>
+            
+            <div class="keyboard-hints">
+                ⌨️ Use arrow keys to navigate • Space to flip
+            </div>
+        </div>
+        
+        <div class="quiz-container" id="quizContainer">
+            <div class="quiz-progress-bar">
+                <div class="quiz-progress-fill" id="quizProgressFill"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3 id="quizQuestionNumber">Question 1 of 10</h3>
+                <img class="quiz-image" id="quizImage" src="" alt="">
+                <p style="font-size: 1.2em; color: #495057;">Identify this species:</p>
+            </div>
+            
+            <div id="quizAnswerArea"></div>
+            
+            <div id="quizFeedback"></div>
+        </div>
+        
+        <div class="results-container" id="resultsContainer">
+            <h2>Quiz Complete!</h2>
+            <div class="score-display" id="scoreDisplay">0/0</div>
+            <p id="scoreMessage"></p>
+            
+            <div id="wrongAnswersSection">
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">Review Incorrect Answers:</h3>
+                <div class="wrong-answers-list" id="wrongAnswersList"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="reviewWrongAnswers()">Review Wrong Answers</button>
+                <button class="action-btn secondary" onclick="resetToMenu()">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let decks = {};
+        let currentDeck = null;
+        let currentCardIndex = 0;
+        let allCards = [];
+        let currentMode = 'study';
+        let selectedDecks = [];
+        
+        // Quiz variables
+        let quizCards = [];
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizType = 'multiple';
+        let wrongAnswers = [];
+        let currentQuizCard = null;
+        let hasAnswered = false;
+        
+        const sourceMap = {
+            'cp': 'Coralpedia',
+            'sg': 'SpongeGuide'
+        };
+        
+        // Event listeners
+        document.getElementById('imageInput').addEventListener('change', handleFileSelect);
+        
+        document.addEventListener('keydown', (e) => {
+            if (currentMode === 'study' && document.getElementById('flashcardContainer').style.display === 'block') {
+                if (e.key === 'ArrowLeft') {
+                    previousCard();
+                } else if (e.key === 'ArrowRight') {
+                    nextCard();
+                } else if (e.key === ' ') {
+                    e.preventDefault();
+                    flipCard();
+                }
+            }
+        });
+        
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            decks = {};
+            allCards = [];
+            
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const filename = file.name.replace(/\.[^/.]+$/, '');
+                    const parts = filename.split('_');
+                    
+                    if (parts.length >= 5) {
+                        const category = parts[0];
+                        const genus = parts[1];
+                        const species = parts[2];
+                        const source = parts[3];
+                        
+                        if (!decks[category]) {
+                            decks[category] = [];
+                        }
+                        
+                        const card = {
+                            file: file,
+                            url: URL.createObjectURL(file),
+                            genus: genus.charAt(0).toUpperCase() + genus.slice(1),
+                            species: species,
+                            source: sourceMap[source] || source,
+                            category: category,
+                            filename: filename,
+                            fullSpecies: `${genus.charAt(0).toUpperCase() + genus.slice(1)} ${species}`
+                        };
+                        
+                        decks[category].push(card);
+                        allCards.push(card);
+                    }
+                }
+            }
+            
+            if (Object.keys(decks).length > 0) {
+                document.getElementById('modeSelector').style.display = 'block';
+                displayDeckSelector();
+            }
+        }
+        
+        function selectMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (mode === 'study') {
+                document.getElementById('quizSetup').style.display = 'none';
+                document.getElementById('deckSelector').style.display = 'block';
+            } else {
+                document.getElementById('flashcardContainer').style.display = 'none';
+                document.getElementById('deckSelector').style.display = 'block';
+                document.getElementById('quizSetup').style.display = 'block';
+            }
+        }
+        
+        function displayDeckSelector() {
+            const deckSelector = document.getElementById('deckSelector');
+            const deckButtons = document.getElementById('deckButtons');
+            
+            deckButtons.innerHTML = '';
+            
+            for (let category in decks) {
+                const btn = document.createElement('button');
+                btn.className = 'deck-btn';
+                btn.innerHTML = `${category.charAt(0).toUpperCase() + category.slice(1)} <span class="deck-count">${decks[category].length}</span>`;
+                btn.onclick = (e) => {
+                    if (currentMode === 'study') {
+                        selectStudyDeck(category);
+                    } else {
+                        toggleDeckSelection(category, e.target);
+                    }
+                };
+                deckButtons.appendChild(btn);
+            }
+            
+            const allBtn = document.createElement('button');
+            allBtn.className = 'deck-btn';
+            allBtn.innerHTML = `All Cards <span class="deck-count">${allCards.length}</span>`;
+            allBtn.onclick = (e) => {
+                if (currentMode === 'study') {
+                    selectStudyDeck('all');
+                } else {
+                    toggleDeckSelection('all', e.target);
+                }
+            };
+            deckButtons.appendChild(allBtn);
+            
+            deckSelector.style.display = 'block';
+        }
+        
+        function selectStudyDeck(category) {
+            currentDeck = category === 'all' ? [...allCards] : [...decks[category]];
+            currentCardIndex = 0;
+            
+            document.querySelectorAll('.deck-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('flashcardContainer').style.display = 'block';
+            document.getElementById('quizSetup').style.display = 'none';
+            displayCard();
+        }
+        
+        function toggleDeckSelection(category, btn) {
+            btn.classList.toggle('active');
+            
+            if (category === 'all') {
+                selectedDecks = btn.classList.contains('active') ? ['all'] : [];
+                document.querySelectorAll('.deck-btn').forEach(b => {
+                    if (b !== btn) b.classList.remove('active');
+                });
+            } else {
+                if (btn.classList.contains('active')) {
+                    selectedDecks.push(category);
+                    document.querySelectorAll('.deck-btn').forEach(b => {
+                        if (b.textContent.startsWith('All')) b.classList.remove('active');
+                    });
+                    selectedDecks = selectedDecks.filter(d => d !== 'all');
+                } else {
+                    selectedDecks = selectedDecks.filter(d => d !== category);
+                }
+            }
+        }
+        
+        function displayCard() {
+            if (!currentDeck || currentDeck.length === 0) return;
+            
+            const card = currentDeck[currentCardIndex];
+            const flashcard = document.getElementById('flashcard');
+            
+            flashcard.classList.remove('flipped');
+            
+            setTimeout(() => {
+                document.getElementById('cardImageFront').src = card.url;
+                document.getElementById('speciesName').textContent = card.fullSpecies;
+                document.getElementById('sourceCredit').textContent = `Source: ${card.source}`;
+            }, 100);
+            
+            document.getElementById('progress').textContent = `${currentCardIndex + 1} / ${currentDeck.length}`;
+            
+            document.querySelectorAll('.nav-btn')[0].disabled = currentCardIndex === 0;
+            document.querySelectorAll('.nav-btn')[1].disabled = currentCardIndex === currentDeck.length - 1;
+        }
+        
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+        
+        function nextCard() {
+            if (currentCardIndex < currentDeck.length - 1) {
+                currentCardIndex++;
+                displayCard();
+            }
+        }
+        
+        function previousCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                displayCard();
+            }
+        }
+        
+        function shuffleCurrentDeck() {
+            if (!currentDeck) return;
+            
+            for (let i = currentDeck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentDeck[i], currentDeck[j]] = [currentDeck[j], currentDeck[i]];
+            }
+            
+            currentCardIndex = 0;
+            displayCard();
+        }
+        
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function startQuiz() {
+            if (selectedDecks.length === 0) {
+                alert('Please select at least one deck!');
+                return;
+            }
+            
+            // Gather cards from selected decks
+            let availableCards = [];
+            if (selectedDecks.includes('all')) {
+                availableCards = [...allCards];
+            } else {
+                selectedDecks.forEach(deck => {
+                    availableCards = availableCards.concat(decks[deck]);
+                });
+            }
+            
+            const quizSize = parseInt(document.getElementById('quizSize').value);
+            quizType = document.querySelector('input[name="quizType"]:checked').value;
+            
+            // Randomly select cards for quiz
+            quizCards = shuffleArray(availableCards).slice(0, Math.min(quizSize, availableCards.length));
+            quizIndex = 0;
+            quizScore = 0;
+            wrongAnswers = [];
+            
+            // Hide setup, show quiz
+            document.getElementById('modeSelector').style.display = 'none';
+            document.getElementById('deckSelector').style.display = 'none';
+            document.getElementById('quizSetup').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            
+            displayQuizQuestion();
+        }
+        
+        function displayQuizQuestion() {
+            if (quizIndex >= quizCards.length) {
+                showResults();
+                return;
+            }
+            
+            currentQuizCard = quizCards[quizIndex];
+            hasAnswered = false;
+            
+            // Update progress
+            document.getElementById('quizQuestionNumber').textContent = `Question ${quizIndex + 1} of ${quizCards.length}`;
+            document.getElementById('quizProgressFill').style.width = `${((quizIndex + 1) / quizCards.length) * 100}%`;
+            
+            // Display image
+            document.getElementById('quizImage').src = currentQuizCard.url;
+            
+            // Clear previous feedback
+            document.getElementById('quizFeedback').innerHTML = '';
+            
+            // Setup answer area based on type
+            const answerArea = document.getElementById('quizAnswerArea');
+            answerArea.innerHTML = '';
+            
+            if (quizType === 'multiple') {
+                setupMultipleChoice();
+            } else {
+                setupFillBlank();
+            }
+        }
+        
+        function setupMultipleChoice() {
+            const answerArea = document.getElementById('quizAnswerArea');
+            
+            // Get 3 random wrong answers
+            let wrongOptions = allCards.filter(c => c.fullSpecies !== currentQuizCard.fullSpecies);
+            wrongOptions = shuffleArray(wrongOptions).slice(0, 3).map(c => c.fullSpecies);
+            
+            // Create all options and shuffle
+            let allOptions = [...wrongOptions, currentQuizCard.fullSpecies];
+            allOptions = shuffleArray(allOptions);
+            
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'multiple-choice-options';
+            
+            allOptions.forEach(option => {
+                const btn = document.createElement('div');
+                btn.className = 'mc-option';
+                btn.textContent = option;
+                btn.onclick = () => selectMultipleChoice(btn, option);
+                optionsDiv.appendChild(btn);
+            });
+            
+            answerArea.appendChild(optionsDiv);
+            
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'submit-btn';
+            submitBtn.textContent = 'Submit Answer';
+            submitBtn.onclick = checkMultipleChoice;
+            answerArea.appendChild(submitBtn);
+        }
+        
+        function selectMultipleChoice(btn, answer) {
+            if (hasAnswered) return;
+            
+            document.querySelectorAll('.mc-option').forEach(opt => opt.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+        
+        function checkMultipleChoice() {
+            if (hasAnswered) return;
+            
+            const selected = document.querySelector('.mc-option.selected');
+            if (!selected) {
+                alert('Please select an answer!');
+                return;
+            }
+            
+            hasAnswered = true;
+            const isCorrect = selected.textContent === currentQuizCard.fullSpecies;
+            
+            if (isCorrect) {
+                quizScore++;
+                selected.classList.add('correct');
+            } else {
+                selected.classList.add('incorrect');
+                document.querySelectorAll('.mc-option').forEach(opt => {
+                    if (opt.textContent === currentQuizCard.fullSpecies) {
+                        opt.classList.add('correct');
+                    }
+                });
+                wrongAnswers.push({
+                    card: currentQuizCard,
+                    userAnswer: selected.textContent,
+                    correctAnswer: currentQuizCard.fullSpecies
+                });
+            }
+            
+            showFeedback(isCorrect);
+        }
+        
+        function setupFillBlank() {
+            const answerArea = document.getElementById('quizAnswerArea');
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'fill-blank-input';
+            input.placeholder = 'Enter genus and species...';
+            input.onkeypress = (e) => {
+                if (e.key === 'Enter') checkFillBlank();
+            };
+            answerArea.appendChild(input);
+            
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'submit-btn';
+            submitBtn.textContent = 'Submit Answer';
+            submitBtn.onclick = checkFillBlank;
+            answerArea.appendChild(submitBtn);
+            
+            input.focus();
+        }
+        
+        function checkFillBlank() {
+            if (hasAnswered) return;
+            
+            const input = document.querySelector('.fill-blank-input');
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctAnswer = currentQuizCard.fullSpecies.toLowerCase();
+            
+            if (!userAnswer) {
+                alert('Please enter an answer!');
+                return;
+            }
+            
+            hasAnswered = true;
+            const isCorrect = userAnswer === correctAnswer;
+            
+            if (isCorrect) {
+                quizScore++;
+                input.style.borderColor = '#28a745';
+                input.style.background = '#d4edda';
+            } else {
+                input.style.borderColor = '#dc3545';
+                input.style.background = '#f8d7da';
+                wrongAnswers.push({
+                    card: currentQuizCard,
+                    userAnswer: input.value,
+                    correctAnswer: currentQuizCard.fullSpecies
+                });
+            }
+            
+            showFeedback(isCorrect);
+        }
+        
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('quizFeedback');
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = `
+                <p><strong>${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</strong></p>
+                <p>The answer is: <em>${currentQuizCard.fullSpecies}</em></p>
+                <p style="font-size: 0.9em; margin-top: 5px;">Source: ${currentQuizCard.source}</p>
+                <button class="nav-btn" style="margin-top: 15px" onclick="nextQuizQuestion()">
+                    ${quizIndex < quizCards.length - 1 ? 'Next Question →' : 'See Results'}
+                </button>
+            `;
+        }
+        
+        function nextQuizQuestion() {
+            quizIndex++;
+            displayQuizQuestion();
+        }
+        
+        function showResults() {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+            
+            const percentage = Math.round((quizScore / quizCards.length) * 100);
+            document.getElementById('scoreDisplay').textContent = `${quizScore}/${quizCards.length}`;
+            
+            let message = '';
+            if (percentage >= 90) message = '🌟 Outstanding! You\'re a benthic expert!';
+            else if (percentage >= 70) message = '🎯 Great job! Keep practicing!';
+            else if (percentage >= 50) message = '💪 Good effort! Review and try again!';
+            else message = '📚 Keep studying! You\'ll get there!';
+            
+            document.getElementById('scoreMessage').textContent = message;
+            
+            // Display wrong answers if any
+            if (wrongAnswers.length > 0) {
+                document.getElementById('wrongAnswersSection').style.display = 'block';
+                const wrongList = document.getElementById('wrongAnswersList');
+                wrongList.innerHTML = '';
+                
+                wrongAnswers.forEach(wrong => {
+                    const item = document.createElement('div');
+                    item.className = 'wrong-answer-item';
+                    item.innerHTML = `
+                        <img class="wrong-answer-image" src="${wrong.card.url}" alt="">
+                        <div class="wrong-answer-text">
+                            <strong>Correct:</strong> <em>${wrong.correctAnswer}</em><br>
+                            <span style="color: #dc3545;">Your answer: ${wrong.userAnswer || 'No answer'}</span><br>
+                            <span style="font-size: 0.9em; color: #6c757d;">Source: ${wrong.card.source}</span>
+                        </div>
+                    `;
+                    wrongList.appendChild(item);
+                });
+            } else {
+                document.getElementById('wrongAnswersSection').style.display = 'none';
+            }
+        }
+        
+        function reviewWrongAnswers() {
+            if (wrongAnswers.length === 0) {
+                alert('No wrong answers to review!');
+                return;
+            }
+            
+            // Create a study deck from wrong answers
+            currentDeck = wrongAnswers.map(w => w.card);
+            currentCardIndex = 0;
+            currentMode = 'study';
+            
+            // Hide results, show flashcard mode
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('flashcardContainer').style.display = 'block';
+            
+            displayCard();
+        }
+        
+        function resetToMenu() {
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('flashcardContainer').style.display = 'none';
+            document.getElementById('modeSelector').style.display = 'block';
+            document.getElementById('deckSelector').style.display = 'block';
+            
+            selectedDecks = [];
+            document.querySelectorAll('.deck-btn').forEach(btn => btn.classList.remove('active'));
+        }
+    </script>
+</body>
+</html>
